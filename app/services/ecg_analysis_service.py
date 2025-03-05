@@ -68,7 +68,7 @@ class ECGAnalysisService:
         # Drop rows where R-R interval is NaN (i.e., missing values)
         df = df.dropna(subset=[RECORD_R_R_INTERVAL])
 
-        df = self.filter_by_zscore(df, 1.8)
+        df = self.filter_by_zscore(df, 1.85)
 
         # Convert the R-R interval (in milliseconds) to heart rate (BPM) - f = 1/T
         df[RECORD_BPM] = 60000 / df[RECORD_R_R_INTERVAL]
@@ -86,9 +86,8 @@ class ECGAnalysisService:
             "max_heart_rate_timestamp": int(max_bpm_row[RECORD_ONSET])  # Maximum heart rate timestamp (QRS start)
         }
     
-    def filter_by_zscore(self, df, threshold=2):
-        mean_rr = df[RECORD_R_R_INTERVAL].mean()
+    def filter_by_zscore(self, df, threshold=1.85):
+        z_scores = np.abs(zscore(df[RECORD_R_R_INTERVAL]))
 
-        df[RECORD_R_R_INTERVAL][np.abs(zscore(df[RECORD_R_R_INTERVAL])) > threshold] = mean_rr
-
-        return df
+        # Remove rows where the Z-score is greater than the threshold
+        return df[z_scores <= threshold]
