@@ -116,9 +116,9 @@ Using Jupyter, we could also find a good threshold. Here are the values for R-R 
 
 <img width="925" alt="Capture d’écran 2025-03-05 à 16 25 25" src="https://github.com/user-attachments/assets/a4b5986b-bbed-4a0d-92bc-533d9b6daeb6" />
 
-Using -1.85 as a negative threshold and 2.5 as positive threshold, it looks like we don't miss data, and we can remove outliers.
+Using -1.85 as a negative threshold and 2.5 as a positive threshold, it looks like we don't miss data, and we can remove outliers.
 
-<img width="920" alt="Capture d’écran 2025-03-05 à 16 25 44" src="https://github.com/user-attachments/assets/77d65f2c-e577-40f8-bc2d-355bb23b3e1a" />
+<img width="910" alt="Capture d’écran 2025-03-05 à 16 48 00" src="https://github.com/user-attachments/assets/95b86fa0-8ba9-4615-af90-b04c5ae500f0" />
 
 ---
 
