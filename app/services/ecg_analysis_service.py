@@ -1,5 +1,7 @@
 from flask import Flask
 import pandas as pd
+import numpy as np
+from scipy.stats import zscore
 
 app = Flask(__name__)
 
@@ -45,6 +47,7 @@ class ECGAnalysisService:
         Returns:
             dict: A dictionary containing the mean, minimum, and maximum heart rate (BPM).
         """
+
         # Load ECG data from the provided CSV file, specifying column names
         df = pd.read_csv(self.record, names=[
             RECORD_WAVE_TYPE, 
@@ -65,6 +68,8 @@ class ECGAnalysisService:
         # Drop rows where R-R interval is NaN (i.e., missing values)
         df = df.dropna(subset=[RECORD_R_R_INTERVAL])
 
+        df = self.filter_by_zscore(df, 1.8)
+
         # Convert the R-R interval (in milliseconds) to heart rate (BPM) - f = 1/T
         df[RECORD_BPM] = 60000 / df[RECORD_R_R_INTERVAL]
 
@@ -81,3 +86,9 @@ class ECGAnalysisService:
             "max_heart_rate_timestamp": int(max_bpm_row[RECORD_ONSET])  # Maximum heart rate timestamp (QRS start)
         }
     
+    def filter_by_zscore(self, df, threshold=2):
+        mean_rr = df[RECORD_R_R_INTERVAL].mean()
+
+        df[RECORD_R_R_INTERVAL][np.abs(zscore(df[RECORD_R_R_INTERVAL])) > threshold] = mean_rr
+
+        return df

@@ -77,7 +77,7 @@ Next steps:
      return df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
   ```
 
-  The results look more accurate:
+  The results look more accurate, but on correct files we could miss some data.
 
    ```
      {
@@ -87,6 +87,29 @@ Next steps:
        "min_heart_rate": 35.75,
        "min_heart_rate_timestamp": 50086370
       }
+   ```
+
+- Another solution could be to use zscore, and replace RECORD_R_R_INTERVAL values in error with the mean RECORD_R_R_INTERVAL value. In this case we should not delete data. We have to find a good threshold.
+
+  ```
+    def filter_by_zscore(self, df, threshold=2):
+        mean_rr = df[RECORD_R_R_INTERVAL].mean()
+
+        df[RECORD_R_R_INTERVAL][np.abs(zscore(df[RECORD_R_R_INTERVAL])) > threshold] = mean_rr
+
+        return df
+  ```
+
+  The results look more accurate:
+
+   ```
+    {
+        "max_heart_rate": 198.02,
+        "max_heart_rate_timestamp": 24525896,
+        "mean_heart_rate": 78.71,
+        "min_heart_rate": 39.08,
+        "min_heart_rate_timestamp": 59474055
+    }
    ```
 ---
 
