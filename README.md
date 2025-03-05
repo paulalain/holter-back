@@ -89,28 +89,37 @@ Next steps:
       }
    ```
 
-- Another solution could be to use zscore, and replace RECORD_R_R_INTERVAL values in error with the mean RECORD_R_R_INTERVAL value. In this case we should not delete data. We have to find a good threshold.
+- Another solution could be to use zscore and remove RECORD_R_R_INTERVAL values with a zscore higher than the threshold.
 
   ```
-    def filter_by_zscore(self, df, threshold=2):
-        mean_rr = df[RECORD_R_R_INTERVAL].mean()
-
-        df[RECORD_R_R_INTERVAL][np.abs(zscore(df[RECORD_R_R_INTERVAL])) > threshold] = mean_rr
-
-        return df
+    def filter_by_zscore(self, df, threshold_positive=2.5, threshold_negative=-1.85):
+        # Calculate the Z-scores
+        z_scores = zscore(df[RECORD_R_R_INTERVAL])
+        
+        # Remove rows where the Z-score exceeds the positive threshold or is below the negative threshold
+        return df[(z_scores <= threshold_positive) & (z_scores >= threshold_negative)]
   ```
 
   The results look more accurate:
 
    ```
     {
-        "max_heart_rate": 198.02,
-        "max_heart_rate_timestamp": 24525896,
-        "mean_heart_rate": 78.71,
-        "min_heart_rate": 39.08,
-        "min_heart_rate_timestamp": 59474055
+        "max_heart_rate": 209.79,
+        "max_heart_rate_timestamp": 25447444,
+        "mean_heart_rate": 79.01,
+        "min_heart_rate": 33.79,
+        "min_heart_rate_timestamp": 73088109
     }
    ```
+
+Using Jupyter, we could also find a good threshold. Here are the values for R-R intervals and BPM without the filter. We can see some outliers values.
+
+<img width="925" alt="Capture d’écran 2025-03-05 à 16 25 25" src="https://github.com/user-attachments/assets/a4b5986b-bbed-4a0d-92bc-533d9b6daeb6" />
+
+Using -1.85 as a negative threshold and 2.5 as positive threshold, it looks like we don't miss data, and we can remove outliers.
+
+<img width="920" alt="Capture d’écran 2025-03-05 à 16 25 44" src="https://github.com/user-attachments/assets/77d65f2c-e577-40f8-bc2d-355bb23b3e1a" />
+
 ---
 
 ## 📌 Requirements
